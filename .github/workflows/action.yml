@@ -2,8 +2,7 @@ name: pytest
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   pytest:
@@ -11,12 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9, 3.10]
+        python-version: ['3.7', '3.8', '3.9', '3.10']
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install poetry
@@ -27,4 +26,4 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction
       - name: Run tests
-        run: poetry run pytest tests
+        run: poetry run pytest
