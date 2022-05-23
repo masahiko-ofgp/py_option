@@ -1,5 +1,5 @@
 .venv/
 .mypy_cache/
-.src/py_option/__pycache__/
-.tests/__pycache__/
-.tests/.pytest_cache/
+/src/py_option/__pycache__/
+/tests/__pycache__/
+/tests/.pytest_cache/
