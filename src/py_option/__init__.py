@@ -19,6 +19,10 @@ class Option:
 
     @staticmethod
     def new(value: t.Optional[t.Any] = None) -> O:
+        ''' Create new Option type.
+        If value is None, Returns (OptionType.Non,).
+        If value, return (OptionType.Some, value).
+        '''
         if value is None:
             return (OptionType.Non,)
         else:
@@ -26,6 +30,7 @@ class Option:
 
     @staticmethod
     def is_some(option: OptionType) -> bool:
+        ''' Returns True if the option is (OptionType.Some, value). '''
         try:
             ty, value = option
         except:
@@ -37,6 +42,7 @@ class Option:
 
     @staticmethod
     def is_non(option: OptionType) -> bool:
+        ''' Returns True if the option is (OptionType.Non,). '''
         try:
             ty, = option
         except:
@@ -48,6 +54,10 @@ class Option:
 
     @staticmethod
     def expect(option: OptionType, msg: str) -> t.Union[t.Any, Exception]:
+        '''
+        If the option is (OptionType.Some, value), return value.
+        If the option is (OptionType.Non,) or else, raise TypeError and message.
+        '''
         if Option.is_some(option):
             _, value = option
             return value
@@ -55,6 +65,10 @@ class Option:
 
     @staticmethod
     def unwrap(option: OptionType) -> t.Union[t.Any, Exception]:
+        '''
+        If the option is (OptionType.Some, value), return value.
+        If the option is (OptionType.Non,) or else, raise TypeError.
+        '''
         if Option.is_some(option):
             _, value = option
             return value
@@ -62,6 +76,10 @@ class Option:
 
     @staticmethod
     def unwrap_or(option: OptionType, default: t.Any) -> t.Any:
+        '''
+        If the option is (OptionType.Some, value), return value.
+        If the option is (OptionType.Non,) or else, return default value.
+        '''
         if Option.is_some(option):
             _, value = option
             return value
@@ -69,6 +87,10 @@ class Option:
 
     @staticmethod
     def unwrap_or_else(option: OptionType, f: t.Callable[..., t.Any]) -> t.Any:
+        '''
+        If the option is (OptionType.Some, value), return value.
+        If the option is (OptionType.Non,) or else, execute f function.
+        '''
         if Option.is_some(option):
             _, value = option
             return value
@@ -76,6 +98,11 @@ class Option:
 
     @staticmethod
     def map(option: OptionType, f: t.Callable[..., t.Any]) -> t.Union[O, Exception]:
+        '''
+        If the option is (OptionType.Some, value), f function applies to value and
+        return (OptionType.Some, new_value).
+        If the option is (OptionType.Non,) or else, raise TypeError.
+        '''
         if Option.is_some(option):
             _, value = option
             if not Option.is_non(value):
@@ -90,6 +117,11 @@ class Option:
     def map_or(option: OptionType,
                default: t.Any,
                f: t.Callable[..., t.Any]) -> t.Union[O, t.Any]:
+        '''
+        If the option is (OptionType.Some, value), f function applies to value and
+        return (OptionType.Some, new_value).
+        If the option is (OptionType.Non,) or else, return default value.
+        '''
         if Option.is_some(option):
             _, value = option
             if not Option.is_non(value):
@@ -104,6 +136,11 @@ class Option:
     def map_or_else(option: OptionType,
                     default_f: t.Callable[..., t.Any],
                     f: t.Callable[..., t.Any]) -> t.Union[O, t.Any]:
+        '''
+        If the option is (OptionType.Some, value), f function applies to value and
+        return (OptionType.Some, new_value).
+        If the option is (OptionType.Non,) or else, execute default_f function.
+        '''
         if Option.is_some(option):
             _, value = option
             if not Option.is_non(value):
