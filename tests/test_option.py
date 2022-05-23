@@ -1,9 +1,10 @@
 import pytest
-from src.py_option import Option, Some, Non
+from src.py_option import Option, OptionType
 
-s = Some(123)
-sn = Some(Non)
-n = Non()
+s = Option.new(123)
+sn = Option.new(Option.new())
+answer = Option.new(444)
+n = Option.new()
 
 def test_compare_some_and_non():
     assert s == s
@@ -23,13 +24,13 @@ def test_expect():
     e = Option.expect(s, "Not Some")
     assert e == 123
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         Option.expect(n, "This is Non")
 
 def test_unwrap():
     assert Option.unwrap(s) == 123
-    
-    with pytest.raises(ValueError):
+
+    with pytest.raises(TypeError):
         Option.unwrap(n)
 
 def test_unwrap_or():
@@ -41,25 +42,20 @@ def test_unwrap_or_else():
     assert Option.unwrap_or_else(n, lambda: "Hello") == "Hello"
 
 def test_map():
-    assert Option.map(s, lambda x: x + 321) == Some(444)
+    assert Option.map(s, lambda x: x + 321) == answer
 
-    with pytest.raises(ValueError):
-        Option.map(n, lambda x: x + 321) 
+    with pytest.raises(TypeError):
+        Option.map(n, lambda x: x + 321)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         Option.map(sn, lambda x: x + 321)
-        
+
 def test_map_or():
-    assert Option.map_or(s, 0, lambda x: x + 321) == Some(444)
+    assert Option.map_or(s, 0, lambda x: x + 321) == answer
     assert Option.map_or(n, 0, lambda x: x + 321) == 0
+    assert Option.map_or(sn, 0, lambda x: x + 321) == 0
 
-    with pytest.raises(ValueError):
-        Option.map_or(sn, 0, lambda x: x + 321)
-        
 def test_map_or_else():
-    assert Option.map_or_else(s, lambda: "Hello", lambda x: x + 321) == Some(444)
+    assert Option.map_or_else(s, lambda: "Hello", lambda x: x + 321) == answer
     assert Option.map_or_else(n, lambda: "Hello", lambda x: x + 321) == "Hello"
-
-    with pytest.raises(ValueError):
-        Option.map_or_else(sn, lambda: "Hello", lambda x: x + 321)
-        
+    assert Option.map_or_else(sn, lambda: "Hello", lambda x: x + 321) == "Hello"

@@ -1,112 +1,115 @@
+from __future__ import annotations
+from enum import Enum, auto
 import typing as t
 
 
-class Some:
-    def __init__(self, value: t.Any) -> None:
-        self.value = value
+class OptionType(Enum):
+    Some = auto()
+    Non = auto()
 
-    def __eq__(self, rhs):
-        # type: (t.Union[Some, t.Any]) -> bool
-        if not isinstance(rhs, Some):
-            return NotImplemented
-        return self.value == rhs.value
-
-    def __ne__(self, rhs):
-        # type: (t.Union[Some, t.Any]) -> bool
-        if not isinstance(rhs, Some):
-            return NotImplemented
-        return self.value != rhs.value
-    
-    def __repr__(self) -> str:
-        return f"Some({self.value})"
-
-    
-class Non:
-    def __init__(self) -> None:
-        self.value = None
-
-    def __eq__(self, rhs):
-        # type: (t.Union[Non, t.Any]) -> bool
-        if not isinstance(rhs, Non):
-            return False
-        return True
-
-    def __ne__(self, rhs):
-        # type: (t.Union[Non, t.Any]) -> bool
-        if not isinstance(rhs, Non):
-            return True
-        return False
-    
-    def __repr__(self) -> str:
-        return "None"
+    def __iter__(self):
+        '''HACK:
+        Implemented for type annotation of the return value of `Option.new`
+        '''
+        return self
 
 
 class Option:
-    @staticmethod
-    def is_some(option: t.Union[Some, Non]) -> bool:
-        return isinstance(option, Some)
+    O: t.TypeAlias = t.Tuple[OptionType, ...]
 
     @staticmethod
-    def is_non(option: t.Union[Some, Non]) -> bool:
-        return isinstance(option, Non)
+    def new(value: t.Optional[t.Any] = None) -> O:
+        if value is None:
+            return (OptionType.Non,)
+        else:
+            return (OptionType.Some, value)
 
     @staticmethod
-    def expect(option: t.Union[Some, Non], msg: str) -> t.Union[t.Any, Exception]:
+    def is_some(option: OptionType) -> bool:
+        try:
+            ty, value = option
+        except:
+            return False
+        else:
+            if ty == OptionType.Some:
+                return True
+            return False
+
+    @staticmethod
+    def is_non(option: OptionType) -> bool:
+        try:
+            ty, = option
+        except:
+            return False
+        else:
+            if ty == OptionType.Non:
+                return True
+            return False
+
+    @staticmethod
+    def expect(option: OptionType, msg: str) -> t.Union[t.Any, Exception]:
         if Option.is_some(option):
-            return option.value
-        raise ValueError(msg)
+            _, value = option
+            return value
+        raise TypeError(msg)
 
     @staticmethod
-    def unwrap(option: t.Union[Some, Non]) -> t.Union[t.Any, Exception]:
+    def unwrap(option: OptionType) -> t.Union[t.Any, Exception]:
         if Option.is_some(option):
-            return option.value
-        raise ValueError
+            _, value = option
+            return value
+        raise TypeError
 
     @staticmethod
-    def unwrap_or(option: t.Union[Some, Non], default: t.Any) -> t.Any:
+    def unwrap_or(option: OptionType, default: t.Any) -> t.Any:
         if Option.is_some(option):
-            return option.value
+            _, value = option
+            return value
         return default
 
     @staticmethod
-    def unwrap_or_else(option: t.Union[Some, Non], f: t.Callable[..., t.Any]) -> t.Any:
+    def unwrap_or_else(option: OptionType, f: t.Callable[..., t.Any]) -> t.Any:
         if Option.is_some(option):
-            return option.value
+            _, value = option
+            return value
         return f()
 
     @staticmethod
-    def map(option: t.Union[Some, Non], f: t.Callable[..., t.Any]) -> t.Union[Some, Exception]:
+    def map(option: OptionType, f: t.Callable[..., t.Any]) -> t.Union[O, Exception]:
         if Option.is_some(option):
-            try:
-                some = Some(f(option.value))
-            except:
-                raise ValueError
+            _, value = option
+            if not Option.is_non(value):
+                new_value = f(value)
+                return Option.new(new_value)
             else:
-                return some
-        raise ValueError("Not Some")
+                raise TypeError
+        else:
+            raise TypeError
 
     @staticmethod
-    def map_or(option: t.Union[Some, Non],
+    def map_or(option: OptionType,
                default: t.Any,
-               f: t.Callable[..., t.Any]) -> t.Union[Some, t.Any]:
+               f: t.Callable[..., t.Any]) -> t.Union[O, t.Any]:
         if Option.is_some(option):
-           try:
-               some = Some(f(option.value))
-           except:
-               raise ValueError
-           else:
-               return some
-        return default
+            _, value = option
+            if not Option.is_non(value):
+                new_value = f(value)
+                return Option.new(new_value)
+            else:
+                return default
+        else:
+            return default
 
     @staticmethod
-    def map_or_else(option: t.Union[Some, Non],
+    def map_or_else(option: OptionType,
                     default_f: t.Callable[..., t.Any],
-                    f: t.Callable[..., t.Any]) -> t.Union[Some, t.Any]:
+                    f: t.Callable[..., t.Any]) -> t.Union[O, t.Any]:
         if Option.is_some(option):
-            try:
-                some = Some(f(option.value))
-            except:
-                raise ValueError
+            _, value = option
+            if not Option.is_non(value):
+                new_value = f(value)
+                return Option.new(new_value)
             else:
-                return some
-        return default_f()
+                return default_f()
+        else:
+            return default_f()
