@@ -59,3 +59,8 @@ def test_map_or_else():
     assert Option.map_or_else(s, lambda: "Hello", lambda x: x + 321) == answer
     assert Option.map_or_else(n, lambda: "Hello", lambda x: x + 321) == "Hello"
     assert Option.map_or_else(sn, lambda: "Hello", lambda x: x + 321) == "Hello"
+
+def test_and_option():
+    assert Option.and_option(n, s) == n
+    assert Option.and_option(s, n) == n
+    assert Option.and_option(s, sn) == sn

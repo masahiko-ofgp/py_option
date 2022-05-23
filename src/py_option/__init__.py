@@ -150,3 +150,16 @@ class Option:
                 return default_f()
         else:
             return default_f()
+
+    @staticmethod
+    def and_option(option: OptionType, optb: OptionType) -> t.Union[OptionType, Exception]:
+        '''
+        Returns (OptionType.Non,) if the option is (OptionType.Non,),
+        otherwise returns optb.
+        '''
+        if Option.is_non(option):
+            return option
+        elif Option.is_some(option):
+            return optb
+        else:
+            raise TypeError
