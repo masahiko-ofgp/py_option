@@ -178,3 +178,17 @@ class Option:
             return optb
         else:
             raise TypeError
+
+    @staticmethod
+    def and_then(option: t.Union[S, N],
+                 f: t.Callable[..., t.Any]) -> t.Union[t.Union[S, N], Exception]:
+        '''
+        Returns (OptionType.Non,) if the option is (OptionType.Non,), otherwise
+        calls f with the warpped and returns the result.
+        '''
+        if Option.is_some(option):
+            return Option.map(option, f)
+        elif Option.is_non(option):
+            return option
+        else:
+            raise TypeError

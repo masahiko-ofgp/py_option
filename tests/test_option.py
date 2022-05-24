@@ -64,3 +64,11 @@ def test_and_option():
     assert Option.and_option(n, s) == n
     assert Option.and_option(s, n) == n
     assert Option.and_option(s, sn) == sn
+
+def test_and_then():
+    assert Option.and_then(s, lambda x: x + 321) == answer
+    assert Option.and_then(n, lambda x: x + 321) == n
+    with pytest.raises(TypeError):
+        Option.and_then(s, lambda x: x + "Hello")
+    with pytest.raises(TypeError):
+        Option.and_then(sn, lambda x: x + 321)
