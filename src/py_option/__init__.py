@@ -21,8 +21,19 @@ class Option:
     @staticmethod
     def new(value: t.Optional[t.Any] = None) -> t.Union[S, N]:
         ''' Create new Option type.
-        If value is None, Returns (OptionType.Non,).
-        If value, return (OptionType.Some, value).
+
+        Args:
+            value: Any type. Default is None.
+        Returns:
+            If value is None, Returns (OptionType.Non,).
+            If value, return (OptionType.Some, value).
+        Examples:
+            >>> some = Option.new(123)
+            >>> some
+            (<OptionType.Some: 1>, 123)
+            >>> non = Option.new()
+            >>> non
+            (<OptionType.Non: 2>,)
         '''
         if value is None:
             return (OptionType.Non,)
@@ -31,7 +42,22 @@ class Option:
 
     @staticmethod
     def is_some(option: t.Union[S, t.Any]) -> bool:
-        ''' Returns True if the option is (OptionType.Some, value). '''
+        ''' Returns True if the option is (OptionType.Some, value).
+
+        Args:
+            option ((OptionType.Some, value) or else)
+        Returns:
+            bool
+        Examples:
+            >>> some = Option.new(123)
+            >>> Option.is_some(some)
+            True
+            >>> non = Option.new()
+            >>> Option.is_some(non)
+            False
+            >>> Option.is_some(123)
+            False
+        '''
         try:
             ty, value = option
         except:
@@ -43,7 +69,22 @@ class Option:
 
     @staticmethod
     def is_non(option: t.Union[N, t.Any]) -> bool:
-        ''' Returns True if the option is (OptionType.Non,). '''
+        ''' Returns True if the option is (OptionType.Non,).
+
+        Args:
+            option ((OptionType.Non,) or else)
+        Returns:
+            bool
+        Examples:
+            >>> non = Option.new()
+            >>> Option.is_non(non)
+            True
+            >>> some = Option.new(123)
+            >>> Option.is_non(some)
+            False
+            >>> Option.is_non(None)
+            False
+        '''
         try:
             ty, = option
         except:
@@ -58,6 +99,27 @@ class Option:
         '''
         If the option is (OptionType.Some, value), return value.
         If the option is (OptionType.Non,) or else, raise TypeError and message.
+
+        Args:
+            option ((OptionType.Some, value) or else)
+            msg (str)
+        Returns:
+            value (Any type) or TypeError
+        Raises:
+            TypeError(msg)
+        Examples:
+            >>> some = Option.new(123)
+            >>> Option.expect(some, "ERROR")
+            123
+            >>> non = Option.new()
+            >>> Option.expect(non, "ERROR")
+            Traceback (most recent call last):
+                ...
+            TypeError: ERROR
+            >>> Option.expect(123, "Not Option Type")
+            Traceback (most recent call last):
+                ...
+            TypeError: Not Option Type
         '''
         if Option.is_some(option):
             _, value = option
@@ -69,6 +131,26 @@ class Option:
         '''
         If the option is (OptionType.Some, value), return value.
         If the option is (OptionType.Non,) or else, raise TypeError.
+
+        Args:
+            option ((OptionType.Some, value) or else)
+        Returns:
+            value (Any type) or TypeError
+        Raises:
+            TypeError
+        Examples:
+            >>> some = Option.new(123)
+            >>> Option.unwrap(some)
+            123
+            >>> non = Option.new()
+            >>> Option.unwrap(non)
+            Traceback (most recent call last):
+                ...
+            TypeError
+            >>> Option.unwrap(123)
+            Traceback (most recent call last):
+                ...
+            TypeError
         '''
         if Option.is_some(option):
             _, value = option
@@ -80,6 +162,21 @@ class Option:
         '''
         If the option is (OptionType.Some, value), return value.
         If the option is (OptionType.Non,) or else, return default value.
+
+        Args:
+            option ((OptionType.Some, value) or else)
+            default (Any type)
+        Returns:
+            value (Any type)
+        Examples:
+            >>> some = Option.new(123)
+            >>> Option.unwrap_or(some, 0)
+            123
+            >>> non = Option.new()
+            >>> Option.unwrap_or(non, 0)
+            0
+            >>> Option.unwrap_or(123, 0)
+            0
         '''
         if Option.is_some(option):
             _, value = option
@@ -91,6 +188,21 @@ class Option:
         '''
         If the option is (OptionType.Some, value), return value.
         If the option is (OptionType.Non,) or else, execute f function.
+
+        Args:
+            option ((OptionType.Some, value) or else)
+            f (function)
+        Returns:
+            value or the result of f
+        Examples:
+            >>> some = Option.new(123)
+            >>> Option.unwrap_or_else(some, lambda: "Hello")
+            123
+            >>> non = Option.new()
+            >>> Option.unwrap_or_else(non, lambda: "Hello")
+            'Hello'
+            >>> Option.unwrap_or_else(123, lambda: "Hello")
+            'Hello'
         '''
         if Option.is_some(option):
             _, value = option
@@ -104,6 +216,30 @@ class Option:
         If the option is (OptionType.Some, value), f function applies to value and
         return (OptionType.Some, new_value).
         If the option is (OptionType.Non,) or else, raise TypeError.
+
+        Args:
+            option ((OptionType.Some, value) or else)
+            f (function)
+        Returns:
+            (OptionType.Some, new_value) or Exception
+        Raises:
+            TypeError
+        Examples:
+            >>> some = Option.new(123)
+            >>> some
+            (<OptionType.Some: 1>, 123)
+            >>> some = Option.map(some, lambda x: x + 321)
+            >>> some
+            (<OptionType.Some: 1>, 444)
+            >>> non = Option.new()
+            >>> non = Option.map(non, lambda x: x + 321)
+            Traceback (most recent call last):
+                ...
+            TypeError
+            >>> Option.map(123, lambda x: x + 321)
+            Traceback (most recent call last):
+                ...
+            TypeError
         '''
         if Option.is_some(option):
             ty, value = option
@@ -127,6 +263,36 @@ class Option:
         If the option is (OptionType.Some, value), f function applies to value and
         return (OptionType.Some, new_value).
         If the option is (OptionType.Non,) or else, return default value.
+
+        Args:
+            option ((OptionType.Some, value) or else)
+            default (Any type)
+            f (function)
+        Returns:
+            (OptionType.Some, new_value) or default
+        Raises:
+            TypeError
+        Examples:
+            >>> some = Option.new(123)
+            >>> some
+            (<OptionType.Some: 1>, 123)
+            >>> some = Option.map_or(some, 0, lambda x: x + 321)
+            >>> some
+            (<OptionType.Some: 1>, 444)
+            >>> non = Option.new()
+            >>> non = Option.map_or(non, 0, lambda x: x + 321)
+            >>> non
+            0
+            >>> Option.map_or(123, 0, lambda x: x + 321)
+            0
+            >>> sn = Option.new(Option.new())
+            >>> Option.map_or(sn, 0, lambda x: x + 321)
+            0
+            >>> some_2 = Option.new(123)
+            >>> Option.map_or(some_2, 0, lambda s: s + "Hello")
+            Traceback (most recent call last):
+                ...
+            TypeError
         '''
         if Option.is_some(option):
             ty, value = option
@@ -150,6 +316,36 @@ class Option:
         If the option is (OptionType.Some, value), f function applies to value and
         return (OptionType.Some, new_value).
         If the option is (OptionType.Non,) or else, execute default_f function.
+
+        Args:
+            option ((OptionType.Some, value) or else)
+            default_f (function)
+            f (function)
+        Returns:
+            (OptionType.Some, new_value) or the result of default_f
+        Raises:
+            TypeError
+        Examples:
+            >>> some = Option.new(123)
+            >>> some
+            (<OptionType.Some: 1>, 123)
+            >>> some = Option.map_or_else(some, lambda: 0, lambda x: x + 321)
+            >>> some
+            (<OptionType.Some: 1>, 444)
+            >>> non = Option.new()
+            >>> non = Option.map_or_else(non, lambda: 0, lambda x: x + 321)
+            >>> non
+            0
+            >>> Option.map_or_else(123, lambda: 0, lambda x: x + 321)
+            0
+            >>> sn = Option.new(Option.new())
+            >>> Option.map_or_else(sn, lambda: 0, lambda x: x + 321)
+            0
+            >>> some_2 = Option.new(123)
+            >>> Option.map_or_else(some_2, lambda: 0, lambda s: s + "Hello")
+            Traceback (most recent call last):
+                ...
+            TypeError
         '''
         if Option.is_some(option):
             ty, value = option
@@ -171,6 +367,22 @@ class Option:
         '''
         Returns (OptionType.Non,) if the option is (OptionType.Non,),
         otherwise returns optb.
+
+        Args:
+            option ((OptionType.Some, value) or (OptionType.Non,))
+            optb ((OptionType.Some, value) or (OptionType.Non,))
+        Returns:
+            (OptionType.Some, value) or (OptionType.Non,)
+        Raises:
+            TypeError
+        Examples:
+            >>> some = Option.new(123)
+            >>> some2 = Option.new(456)
+            >>> non = Option.new()
+            >>> Option.and_option(some, some2)
+            (<OptionType.Some: 1>, 456)
+            >>> Option.and_option(non, some2)
+            (<OptionType.Non: 2>,)
         '''
         if Option.is_non(option):
             return option
@@ -185,6 +397,25 @@ class Option:
         '''
         Returns (OptionType.Non,) if the option is (OptionType.Non,), otherwise
         calls f with the warpped and returns the result.
+
+        Args:
+            option ((OptionType.Some, value) or (OptionType.Non,))
+            f (function)
+        Returns:
+            (OptionType.Some, value) or (OptionType.Non,)
+        Raises:
+            TypeError
+        Examples:
+            >>> some = Option.new(123)
+            >>> non = Option.new()
+            >>> Option.and_then(some, lambda x: x + 321)
+            (<OptionType.Some: 1>, 444)
+            >>> Option.and_then(non, lambda x: x + 321)
+            (<OptionType.Non: 2>,)
+            >>> Option.and_then(123, lambda x: x + 321)
+            Traceback (most recent call last):
+                ...
+            TypeError
         '''
         if Option.is_some(option):
             return Option.map(option, f)

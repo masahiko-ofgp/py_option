@@ -26,6 +26,6 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction
       - name: Run tests
-        run: poetry run pytest
+        run: poetry run pytest --doctest-modules
       - name: Run mypy
         run: poetry run mypy src/*
