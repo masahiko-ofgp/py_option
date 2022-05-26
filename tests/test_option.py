@@ -72,3 +72,11 @@ def test_and_then():
         Option.and_then(s, lambda x: x + "Hello")
     with pytest.raises(TypeError):
         Option.and_then(sn, lambda x: x + 321)
+
+def test_zip():
+    s2 = Option.new("Hello")
+    assert Option.zip(s, s2) == (OptionType.Some, (123, 'Hello'))
+    assert Option.zip(s, n) == (OptionType.Non,)
+    assert Option.zip(n, s) == (OptionType.Non,)
+    with pytest.raises(TypeError):
+        Option.zip(s2, "world")

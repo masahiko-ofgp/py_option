@@ -423,3 +423,42 @@ class Option:
             return option
         else:
             raise TypeError
+
+    @staticmethod
+    def zip(option: t.Union[S, t.Any],
+            optb: t.Union[S, t.Any]) -> t.Union[t.Union[S, N], Exception]:
+        '''Zips option with another option.
+
+        Args:
+            option ((OptionType.Some, value1) or else)
+            optb ((OptionType.Some, value2) or else)
+        Returns:
+            (OptionType.Some, (value1, value2)) or (OptionType.Non,)
+        Raises:
+            TypeError
+        Examples:
+            >>> some1 = Option.new(123)
+            >>> some2 = Option.new("Hello")
+            >>> Option.zip(some1, some2)
+            (<OptionType.Some: 1>, (123, 'Hello'))
+            >>> non = Option.new()
+            >>> Option.zip(some1, non)
+            (<OptionType.Non: 2>,)
+            >>> Option.zip(some2, "world")
+            Traceback (most recent call last):
+                ...
+            TypeError
+        '''
+        if Option.is_non(option):
+            return option
+        elif Option.is_some(option):
+            if Option.is_non(optb):
+                return Option.new()
+            elif Option.is_some(optb):
+                ty, value1 = option
+                _, value2 = optb
+                return (ty, (value1, value2))
+            else:
+                raise TypeError
+        else:
+            raise TypeError
