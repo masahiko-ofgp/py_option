@@ -462,3 +462,94 @@ class Option:
                 raise TypeError
         else:
             raise TypeError
+
+    @staticmethod
+    def flatten(option: t.Union[S, t.Any]) -> t.Union[t.Union[S, N], Exception]:
+        '''Convert from (Option type, (Option type, value )) to (Option type, value)
+
+        Args:
+            option ((OptionType.Some, value) or else)
+        Returns:
+            (OptionType.Some, value) or (OptionType.Non,)
+        Raises:
+            TypeError
+        Examples:
+            >>> sss = Option.new(Option.new(Option.new(123)))
+            >>> Option.flatten(sss)
+            (<OptionType.Some: 1>, (<OptionType.Some: 1>, 123))
+            >>> Option.flatten(Option.flatten(sss))
+            (<OptionType.Some: 1>, 123)
+            >>> sn = Option.new(Option.new())
+            >>> Option.flatten(sn)
+            (<OptionType.Non: 2>,)
+            >>> n = Option.new()
+            >>> Option.flatten(n)
+            (<OptionType.Non: 2>,)
+            >>> Option.flatten((1,2,3))
+            Traceback (most recent call last):
+                ...
+            TypeError
+        '''
+        def is_option(op: t.Any) -> bool:
+            if Option.is_non(op) or Option.is_some(op):
+                return True
+            else:
+                return False
+
+        if is_option(option):
+            if Option.is_non(option):
+                return option
+            else:
+                ty, value = option
+                if is_option(value):
+                    return value
+                else:
+                    return option
+        else:
+           raise TypeError
+
+    @staticmethod
+    def filter(option: t.Union[S, t.Any],
+               predicate: t.Callable[..., bool]) -> t.Union[t.Union[S, N], Exception]:
+        '''
+        (OptionType.Some, value) if predicate returns True.
+        (OptionType.Non,) if predicate returns False.
+
+        Args:
+            option ((OptionType.Some, value) or else)
+            predicate (function that return bool)
+        Returns:
+            (OptionType.Some, value) or (OptionType.Non,)
+        Raises:
+             TypeError
+        Examples:
+            >>> some = Option.new(1)
+            >>> Option.filter(some, lambda x: x > 0)
+            (<OptionType.Some: 1>, 1)
+            >>> Option.filter(some, lambda x: x < 0)
+            (<OptionType.Non: 2>,)
+            >>> non = Option.new()
+            >>> Option.filter(non, lambda x: x > 0)
+            (<OptionType.Non: 2>,)
+            >>> Option.filter(some, lambda x: x + 2)
+            Traceback (most recent call last):
+                ...
+            TypeError
+            >>> Option.filter(2, lambda x: x > 0)
+            Traceback (most recent call last):
+                ...
+            TypeError
+        '''
+        if Option.is_non(option):
+            return option
+        elif Option.is_some(option):
+            _, value = option
+            result = predicate(value)
+            if result is True:
+                return option
+            elif result is False:
+                return Option.new()
+            else:
+                raise TypeError
+        else:
+            raise TypeError

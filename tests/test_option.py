@@ -80,3 +80,16 @@ def test_zip():
     assert Option.zip(n, s) == (OptionType.Non,)
     with pytest.raises(TypeError):
         Option.zip(s2, "world")
+
+def test_flatten():
+    assert Option.flatten(Option.new(Option.new(123))) == (OptionType.Some, 123)
+    assert Option.flatten(sn) == (OptionType.Non,)
+    with pytest.raises(TypeError):
+        Option.flatten((1,2,3))
+
+def test_filter():
+    assert Option.filter(s, lambda x: x > 100) == (OptionType.Some, 123)
+    assert Option.filter(s, lambda x: x < 100) == (OptionType.Non,)
+    assert Option.filter(n, lambda x: x > 100) == (OptionType.Non,)
+    with pytest.raises(TypeError):
+        Option.filter(s, lambda x: x + 321)
