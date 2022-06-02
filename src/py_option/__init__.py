@@ -553,3 +553,40 @@ class Option:
                 raise TypeError
         else:
             raise TypeError
+
+    @staticmethod
+    def or_option(option: t.Union[S, t.Any],
+                  optb: t.Union[S, t.Any]) -> t.Union[t.Union[S, N], Exception]:
+        ''' Returns the option if it is (OptionType.Some, value), otherwise returns optb.
+
+        Args:
+            option ((OptionType.Some, value) or else)
+            optb   ((OptionType.Some, value) or else)
+        Returns:
+            (OptionType.Some, value) or (OptionType.Non,)
+        Raises:
+            TypeError
+        Examples:
+            >>> x = Option.new(123)
+            >>> y = Option.new()
+            >>> Option.or_option(x, y)
+            (<OptionType.Some: 1>, 123)
+            >>> z = Option.new()
+            >>> Option.or_option(y, z)
+            (<OptionType.Non: 2>,)
+            >>> Option.or_option(y, 123)
+            Traceback (most recent call last):
+                ...
+            TypeError
+        '''
+        if Option.is_some(option):
+            return option
+        elif Option.is_non(option):
+            if Option.is_some(optb):
+                return optb
+            elif Option.is_non(optb):
+                return option
+            else:
+                raise TypeError
+        else:
+            raise TypeError

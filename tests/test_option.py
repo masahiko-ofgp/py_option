@@ -93,3 +93,9 @@ def test_filter():
     assert Option.filter(n, lambda x: x > 100) == (OptionType.Non,)
     with pytest.raises(TypeError):
         Option.filter(s, lambda x: x + 321)
+
+def test_or_option():
+    assert Option.or_option(s, n) == (OptionType.Some, 123)
+    assert Option.or_option(n, s) == (OptionType.Some, 123)
+    assert Option.or_option(sn, n) == (OptionType.Some, (OptionType.Non,))
+    assert Option.or_option(Option.flatten(sn), n) == (OptionType.Non,)
