@@ -1,15 +1,9 @@
 from abc import abstractmethod, ABC
 
 
-class OptionTypeError(Exception):
-    """
-    """
-    def __init__(self, msg):
-        self.msg = msg
-
-
 class OptionType(ABC):
-    """Interface of Option.
+    """Interface of OptionType.
+    
     """
     @abstractmethod
     def is_some(self): pass
@@ -23,9 +17,16 @@ class OptionType(ABC):
     @abstractmethod
     def unwrap_or(self, default): pass
 
+    @abstractmethod
+    def __repr__(self): pass
+
+    @abstractmethod
+    def __eq__(self, rhs): pass
+
 
 class Some(OptionType):
-    """
+    """Some is OptionType with some value.
+    
     """
     def __init__(self, val):
         self.val = val
@@ -46,9 +47,15 @@ class Some(OptionType):
     def __repr__(self):
         return f"Option::Some({self.val})"
 
+    def __eq__(self, rhs):
+        if rhs.is_some():
+            return self.val == rhs.val
+        else:
+            return False
 
 class Non(OptionType):
-    """
+    """Non is OptionType with no value.
+    
     """
     def __init__(self):
         self.val = None
@@ -68,26 +75,17 @@ class Non(OptionType):
     def __repr__(self):
         return "Option::Non"
 
-class Option(OptionType):
+    def __eq__(self, rhs):
+        return rhs.is_non()
+
+
+class Option():
+    """Option class create Some or Non.
+
     """
-    """
-    def __init__(self, val=None):
+    @staticmethod
+    def new(val=None):
         if val is None:
-            self.typ = Non()
+            return Non()
         else:
-            self.typ = Some(val)
-
-    def is_some(self):
-        return self.typ.is_some()
-
-    def is_non(self):
-        return self.typ.is_non()
-
-    def unwrap(self):
-        return self.typ.unwrap()
-
-    def unwrap_or(self, default):
-        return self.typ.unwrap_or(default)
-
-    def __repr__(self):
-        return f"{self.typ}"
+            return Some(val)
