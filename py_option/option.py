@@ -9,6 +9,9 @@ class OptionType(ABC):
     def is_some(self): pass
 
     @abstractmethod
+    def is_some_and(self, f): pass
+
+    @abstractmethod
     def is_non(self): pass
 
     @abstractmethod
@@ -33,6 +36,9 @@ class Some(OptionType):
 
     def is_some(self):
         return True
+
+    def is_some_and(self, f):
+        return (self.is_some and f(self.val))
 
     def is_non(self):
         return False
@@ -61,6 +67,9 @@ class Non(OptionType):
         self.val = None
 
     def is_some(self):
+        return False
+    
+    def is_some_and(self, f):
         return False
 
     def is_non(self):
