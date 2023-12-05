@@ -1,6 +1,11 @@
 from abc import abstractmethod, ABC
 
 
+class OptionTypeError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+
 class OptionType(ABC):
     """Interface of OptionType.
     
@@ -13,6 +18,12 @@ class OptionType(ABC):
 
     @abstractmethod
     def is_non(self): pass
+
+    @abstractmethod
+    def expect(self, msg): pass
+
+    @abstractmethod
+    def filter(self, predicate): pass
 
     @abstractmethod
     def unwrap(self): pass
@@ -43,6 +54,15 @@ class Some(OptionType):
     def is_non(self):
         return False
 
+    def expect(self, msg):
+        return self.val
+
+    def filter(self, predicate):
+        if predicate(self.val):
+            return self
+        else:
+            return Option.new()
+
     def unwrap(self):
         return self.val
 
@@ -59,6 +79,7 @@ class Some(OptionType):
         else:
             return False
 
+
 class Non(OptionType):
     """Non is OptionType with no value.
     
@@ -74,6 +95,12 @@ class Non(OptionType):
 
     def is_non(self):
         return True
+
+    def expect(self, msg):
+        return msg
+
+    def filter(self, predicate):
+        return self
 
     def unwrap(self):
         raise OptionTypeError("Option::Non type does not have val.")
