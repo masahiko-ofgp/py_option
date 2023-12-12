@@ -121,6 +121,10 @@ class Option():
     """
     @staticmethod
     def new(val=None):
+        """Create new Some(x) or Non.
+
+        If val is not None, return Some(val).
+        """
         if val is None:
             return Non()
         else:
