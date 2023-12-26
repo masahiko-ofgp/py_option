@@ -63,7 +63,9 @@ class OptionType(ABC):
 
 
 class Some(OptionType):
-    """Some is OptionType with some value."""
+    """Some is OptionType with some value.
+    """
+
     def __init__(self, val):
         self.val = val
 
@@ -80,10 +82,13 @@ class Some(OptionType):
         return self.val
 
     def filter(self, predicate):
-        if predicate(self.val):
-            return self
-        else:
-            return Option.new()
+        try:
+            if predicate(self.val):
+                return self
+            else:
+                return Option.new()
+        except TypeError:
+            raise
 
     def unwrap(self):
         return self.val
@@ -103,7 +108,9 @@ class Some(OptionType):
 
 
 class Non(OptionType):
-    """Non is OptionType with no value."""
+    """Non is OptionType with no value.
+    """
+
     def __init__(self):
         self.val = None
 
@@ -117,7 +124,7 @@ class Non(OptionType):
         return True
 
     def expect(self, msg):
-        return msg
+        raise OptionTypeError(msg)
 
     def filter(self, predicate):
         return self
