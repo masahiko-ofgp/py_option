@@ -53,8 +53,17 @@ def test_filter():
 
 
 def test_unwrap():
-    pass
+    assert s.unwrap() == 123
+
+    with pytest.raises(OptionTypeError):
+        n.unwrap()
+
+    assert ss.unwrap() == s
+    assert sn.unwrap() == n
 
 
 def test_unwrap_or():
-    pass
+    assert s.unwrap_or("Default") == 123
+    assert n.unwrap_or("Default") == "Default"
+    assert ss.unwrap_or("Default") == s
+    assert sn.unwrap_or("Default") == n
