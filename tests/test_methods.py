@@ -67,3 +67,19 @@ def test_unwrap_or():
     assert n.unwrap_or("Default") == "Default"
     assert ss.unwrap_or("Default") == s
     assert sn.unwrap_or("Default") == n
+
+
+def test_and():
+    assert s.and_(n) == n
+    assert n.and_(s) == n
+    assert n.and_(n) == n
+    assert s.and_(ss) == ss
+    assert s.and_(sn) == sn
+    assert ss.and_(sn) == sn
+
+
+def test_or():
+    assert s.or_(n) == s
+    assert n.or_(s) == s
+    assert s.or_(ss) == s
+    assert ss.or_(sn) == ss

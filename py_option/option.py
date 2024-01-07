@@ -59,7 +59,16 @@ class OptionType(ABC):
     def __repr__(self): pass
 
     @abstractmethod
+    def __bool__(self): pass
+
+    @abstractmethod
     def __eq__(self, rhs): pass
+
+    @abstractmethod
+    def and_(self, other): pass
+
+    @abstractmethod
+    def or_(self, other): pass
 
 
 class Some(OptionType):
@@ -97,6 +106,9 @@ class Some(OptionType):
         del default
         return self.val
 
+    def __bool__(self):
+        return True
+
     def __repr__(self):
         return f"Option::Some({self.val})"
 
@@ -105,6 +117,12 @@ class Some(OptionType):
             return self.val == rhs.val
         else:
             return False
+
+    def and_(self, other):
+        return other
+
+    def or_(self, other):
+        return self
 
 
 class Non(OptionType):
@@ -135,11 +153,20 @@ class Non(OptionType):
     def unwrap_or(self, default):
         return default
 
+    def __bool__(self):
+        return True
+
     def __repr__(self):
         return "Option::Non"
 
     def __eq__(self, rhs):
         return rhs.is_non()
+
+    def and_(self, other):
+        return self
+
+    def or_(self, other):
+        return other
 
 
 class Option():
