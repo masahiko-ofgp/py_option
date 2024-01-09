@@ -70,6 +70,9 @@ class OptionType(ABC):
     @abstractmethod
     def or_(self, other): pass
 
+    @abstractmethod
+    def and_then(self, f): pass
+
 
 class Some(OptionType):
     """Some is OptionType with some value.
@@ -95,7 +98,7 @@ class Some(OptionType):
             if predicate(self.val):
                 return self
             else:
-                return Option.new()
+                return Non()
         except TypeError:
             raise
 
@@ -124,6 +127,13 @@ class Some(OptionType):
     def or_(self, other):
         return self
 
+    def and_then(self, f):
+
+        def wrapped_func(f):
+            return Some(f)
+
+        return wrapped_func(f(self.val))
+
 
 class Non(OptionType):
     """Non is OptionType with no value.
@@ -139,6 +149,8 @@ class Non(OptionType):
         return False
 
     def is_non(self):
+        """FIXME: pytest failed!! missing positional argument 'self'.
+        """ 
         return True
 
     def expect(self, msg):
@@ -160,7 +172,10 @@ class Non(OptionType):
         return "Option::Non"
 
     def __eq__(self, rhs):
-        return rhs.is_non()
+        if rhs.is_non():
+            return True
+        else:
+            return False
 
     def and_(self, other):
         return self
@@ -168,17 +183,5 @@ class Non(OptionType):
     def or_(self, other):
         return other
 
-
-class Option():
-    """Option class create Some or Non."""
-
-    @staticmethod
-    def new(val=None):
-        """Create new Some(x) or Non.
-
-        If val is not None, return Some(val).
-        """
-        if val is None:
-            return Non()
-        else:
-            return Some(val)
+    def and_then(self, f):
+        return self

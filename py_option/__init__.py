@@ -1,1 +1,1 @@
-from .option import Option, OptionTypeError
+from .option import OptionTypeError, Some, Non
