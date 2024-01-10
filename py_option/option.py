@@ -79,6 +79,7 @@ class Some(OptionType):
     """
 
     def __init__(self, val):
+        self.t = type(val)
         self.val = val
 
     def is_some(self):
@@ -98,7 +99,7 @@ class Some(OptionType):
             if predicate(self.val):
                 return self
             else:
-                return Non()
+                return Non(self.t)
         except TypeError:
             raise
 
@@ -113,11 +114,11 @@ class Some(OptionType):
         return True
 
     def __repr__(self):
-        return f"Option::Some({self.val})"
+        return f"Option::Some({self.val}: {self.t})"
 
     def __eq__(self, rhs):
         if rhs.is_some():
-            return self.val == rhs.val
+            return (self.t == rhs.t) and (self.val == rhs.val)
         else:
             return False
 
@@ -139,7 +140,8 @@ class Non(OptionType):
     """Non is OptionType with no value.
     """
 
-    def __init__(self):
+    def __init__(self, t):
+        self.t = t
         self.val = None
 
     def is_some(self):
@@ -150,7 +152,7 @@ class Non(OptionType):
 
     def is_non(self):
         """FIXME: pytest failed!! missing positional argument 'self'.
-        """ 
+        """
         return True
 
     def expect(self, msg):
@@ -169,13 +171,10 @@ class Non(OptionType):
         return True
 
     def __repr__(self):
-        return "Option::Non"
+        return "Option::Non({self.val}: {self.t})"
 
     def __eq__(self, rhs):
-        if rhs.is_non():
-            return True
-        else:
-            return False
+        return (self.t == rhs.t) and (self.val == rhs.val)
 
     def and_(self, other):
         return self

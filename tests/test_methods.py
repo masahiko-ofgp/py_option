@@ -3,7 +3,7 @@ import pytest
 
 
 s = Some(123)
-n = Non()
+n = Non(int)
 
 ss = Some(s)
 sn = Some(n)
@@ -36,14 +36,14 @@ def test_expect():
     with pytest.raises(OptionTypeError, match="Panic!!"):
         n.expect("Panic!!")
 
-    assert ss.expect("Panic!!") == Some(123)
-    assert sn.expect("Panic!!") == Non
+    assert ss.expect("Panic!!") == s
+    assert sn.expect("Panic!!") == n
 
 
 def test_filter():
-    assert s.filter(lambda x: x % 2 == 0) == Non
+    assert s.filter(lambda x: x % 2 == 0) == Non(int)
     assert s.filter(lambda x: x % 2 == 1) == Some(123)
-    assert n.filter(lambda x: x % 2 == 0) == Non
+    assert n.filter(lambda x: x % 2 == 0) == Non(int)
 
     with pytest.raises(TypeError):
         ss.filter(lambda x: x % 2 == 0)
@@ -58,31 +58,31 @@ def test_unwrap():
     with pytest.raises(OptionTypeError):
         n.unwrap()
 
-    assert ss.unwrap() == Some(123)
-    assert sn.unwrap() == Non
+    assert ss.unwrap() == s
+    assert sn.unwrap() == n
 
 
 def test_unwrap_or():
     assert s.unwrap_or("Default") == 123
     assert n.unwrap_or("Default") == "Default"
-    assert ss.unwrap_or("Default") == Some(123)
-    assert sn.unwrap_or("Default") == Non
+    assert ss.unwrap_or("Default") == s
+    assert sn.unwrap_or("Default") == n
 
 
 def test_and():
-    assert s.and_(n) == Non
-    assert n.and_(s) == Non
-    assert n.and_(n) == Non
-    assert s.and_(ss) == Some(Some(123))
-    assert s.and_(sn) == Some(Non)
-    assert ss.and_(sn) == Some(Non)
+    assert s.and_(n) == Non(int)
+    assert n.and_(s) == Non(int)
+    assert n.and_(n) == Non(int)
+    assert s.and_(ss) == ss
+    assert s.and_(sn) == sn
+    assert ss.and_(sn) == sn
 
 
 def test_or():
-    assert s.or_(n) == Some(123)
-    assert n.or_(s) == Some(123)
-    assert s.or_(ss) == Some(123)
-    assert ss.or_(sn) == Some(Some(123))
+    assert s.or_(n) == s
+    assert n.or_(s) == s
+    assert s.or_(ss) == s
+    assert ss.or_(sn) == ss
 
 
 def test_and_then():
