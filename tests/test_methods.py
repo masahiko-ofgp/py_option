@@ -3,7 +3,7 @@ import pytest
 
 
 s = Some(123)
-n = Non(int)
+n = Non()
 
 ss = Some(s)
 sn = Some(n)
@@ -41,9 +41,9 @@ def test_expect():
 
 
 def test_filter():
-    assert s.filter(lambda x: x % 2 == 0) == Non(int)
+    assert s.filter(lambda x: x % 2 == 0) == Non()
     assert s.filter(lambda x: x % 2 == 1) == Some(123)
-    assert n.filter(lambda x: x % 2 == 0) == Non(int)
+    assert n.filter(lambda x: x % 2 == 0) == Non()
 
     with pytest.raises(TypeError):
         ss.filter(lambda x: x % 2 == 0)
@@ -70,9 +70,9 @@ def test_unwrap_or():
 
 
 def test_and():
-    assert s.and_(n) == Non(int)
-    assert n.and_(s) == Non(int)
-    assert n.and_(n) == Non(int)
+    assert s.and_(n) == n
+    assert n.and_(s) == n
+    assert n.and_(n) == n
     assert s.and_(ss) == ss
     assert s.and_(sn) == sn
     assert ss.and_(sn) == sn
@@ -87,3 +87,4 @@ def test_or():
 
 def test_and_then():
     assert s.and_then(str) == Some("123")
+    assert n.and_then(str) == n
